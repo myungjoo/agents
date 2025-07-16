@@ -1,0 +1,295 @@
+/* Dashboard Styles */
+
+body {
+    background-color: #f8f9fa;
+}
+
+.navbar-brand i {
+    margin-right: 8px;
+}
+
+.status-card {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
+}
+
+.status-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: white;
+    font-size: 20px;
+}
+
+.status-info h6 {
+    margin: 0;
+    color: #6c757d;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.status-info span {
+    font-size: 24px;
+    font-weight: bold;
+    color: #212529;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 8px;
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #e9ecef;
+    font-weight: 600;
+}
+
+.card-header i {
+    margin-right: 8px;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-running {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-completed {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-failed {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.status-stopped {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.agent-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-left: 4px solid #007bff;
+}
+
+.agent-card.success {
+    border-left-color: #28a745;
+}
+
+.agent-card.warning {
+    border-left-color: #ffc107;
+}
+
+.agent-card.danger {
+    border-left-color: #dc3545;
+}
+
+.agent-card.info {
+    border-left-color: #17a2b8;
+}
+
+.agent-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.agent-name {
+    font-weight: 600;
+    font-size: 16px;
+    margin: 0;
+}
+
+.agent-status {
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.agent-metrics {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.metric {
+    text-align: center;
+}
+
+.metric-value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.metric-label {
+    font-size: 12px;
+    color: #6c757d;
+    text-transform: uppercase;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.modal-xl {
+    max-width: 90%;
+}
+
+.audit-details {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.audit-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 5px;
+}
+
+.audit-section h6 {
+    margin-bottom: 10px;
+    color: #495057;
+    font-weight: 600;
+}
+
+.issue-item {
+    background: white;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border-left: 4px solid #dc3545;
+}
+
+.issue-item.warning {
+    border-left-color: #ffc107;
+}
+
+.issue-item.info {
+    border-left-color: #17a2b8;
+}
+
+.issue-severity {
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-weight: 500;
+    margin-right: 8px;
+}
+
+.severity-critical {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.severity-warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.severity-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .status-card {
+        margin-bottom: 10px;
+    }
+    
+    .agent-metrics {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .table-responsive {
+        font-size: 14px;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #212529;
+        color: #f8f9fa;
+    }
+    
+    .card {
+        background-color: #343a40;
+        color: #f8f9fa;
+    }
+    
+    .card-header {
+        background-color: #495057;
+        border-bottom-color: #6c757d;
+    }
+    
+    .status-card {
+        background-color: #343a40;
+    }
+    
+    .agent-card {
+        background-color: #343a40;
+    }
+    
+    .table {
+        color: #f8f9fa;
+    }
+    
+    .table th {
+        color: #adb5bd;
+    }
+}
