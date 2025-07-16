@@ -1,26 +1,22 @@
 """
-LLM Provider Abstraction Layer
+LLM Provider Management Module
 
-This module provides a unified interface for different LLM providers
-including OpenAI, Google Gemini, Anthropic Claude, and custom providers.
+Handles multiple LLM providers with automatic fallback and load balancing.
+Supports OpenAI GPT, Google Gemini, Anthropic Claude, and custom providers.
 """
 
-from .base import LLMProvider, LLMResponse, LLMRequest
-from .factory import LLMFactory
-from .providers import (
-    OpenAIProvider,
-    GeminiProvider,
-    ClaudeProvider,
-    CustomProvider
-)
+from .manager import LLMManager
+from .provider import LLMProvider, OpenAIProvider, GeminiProvider, ClaudeProvider
+from .request import LLMRequest, LLMResponse
+from .config import LLMConfig
 
 __all__ = [
-    'LLMProvider',
-    'LLMResponse', 
-    'LLMRequest',
-    'LLMFactory',
-    'OpenAIProvider',
-    'GeminiProvider',
-    'ClaudeProvider',
-    'CustomProvider'
+    "LLMManager",
+    "LLMProvider",
+    "OpenAIProvider", 
+    "GeminiProvider",
+    "ClaudeProvider",
+    "LLMRequest",
+    "LLMResponse",
+    "LLMConfig"
 ]
