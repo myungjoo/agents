@@ -1,7 +1,7 @@
 # Core Framework
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
-pydantic==2.5.0
+pydantic==2.8.2
 sqlalchemy==2.0.23
 alembic==1.13.0
 
@@ -12,7 +12,6 @@ anthropic==0.7.8
 requests==2.31.0
 
 # Database
-sqlite3
 psycopg2-binary==2.9.9
 
 # Web Interface
@@ -32,7 +31,6 @@ pygments==2.17.2
 tree-sitter==0.20.4
 
 # Code Analysis
-ast==0.0.2
 pylint==3.0.3
 flake8==6.1.0
 mypy==1.7.1
@@ -49,9 +47,8 @@ memory-profiler==0.61.0
 # GitHub Integration
 PyGithub==1.59.1
 
-# MCP and A2A
-mcp==0.1.0
-a2a-client==0.1.0
+# MCP Integration
+mcp==1.11.0
 
 # Utilities
 python-dotenv==1.0.0
