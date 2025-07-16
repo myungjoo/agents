@@ -1,9 +1,47 @@
 #!/bin/bash
 
 # AI Agent System Setup Script
-# This script sets up the AI agent system on Ubuntu 22.04/24.04
+# This script sets up the AI agent system on Ubuntu 22.04/24.04 and Debian 12 (including ARM)
 
 set -e
+
+# Detect OS and architecture
+OS_ID=""
+OS_VERSION=""
+ARCH=$(uname -m)
+IS_ARM=false
+
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    OS_ID=$ID
+    OS_VERSION=$VERSION_ID
+fi
+
+# Check if running on ARM architecture
+if [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then
+    IS_ARM=true
+fi
+
+# Validate OS compatibility
+validate_os() {
+    if [[ "$OS_ID" == "ubuntu" ]]; then
+        if [[ "$OS_VERSION" != "22.04" && "$OS_VERSION" != "24.04" ]]; then
+            print_warning "This script is tested on Ubuntu 22.04/24.04, but you're running $OS_VERSION"
+        fi
+    elif [[ "$OS_ID" == "debian" ]]; then
+        if [[ "$OS_VERSION" != "12" ]]; then
+            print_warning "This script is tested on Debian 12, but you're running $OS_VERSION"
+        fi
+    else
+        print_error "Unsupported OS: $OS_ID $OS_VERSION"
+        print_error "This script supports Ubuntu 22.04/24.04 and Debian 12"
+        exit 1
+    fi
+    
+    if [[ "$IS_ARM" == true ]]; then
+        print_status "ARM architecture detected ($ARCH)"
+    fi
+}
 
 # Colors for output
 RED='\033[0;31m'
@@ -37,40 +75,54 @@ fi
 
 print_status "Starting AI Agent System setup..."
 
+# Validate OS compatibility
+validate_os
+
+print_status "Detected: $OS_ID $OS_VERSION on $ARCH"
+
 # Update system packages
 print_status "Updating system packages..."
 sudo apt update
 
 # Install system dependencies
 print_status "Installing system dependencies..."
-sudo apt install -y \
-    python3 \
-    python3-pip \
-    python3-venv \
-    git \
-    curl \
-    wget \
-    build-essential \
-    libssl-dev \
-    libffi-dev \
-    python3-dev \
-    sqlite3 \
-    postgresql-client \
-    nginx \
-    supervisor \
-    htop \
-    tree \
-    jq \
-    unzip
+
+# Base packages that work on all architectures
+BASE_PACKAGES="python3 python3-pip python3-venv git curl wget build-essential \
+libssl-dev libffi-dev python3-dev sqlite3 postgresql-client nginx \
+supervisor htop tree jq unzip"
+
+# ARM-specific considerations
+if [[ "$IS_ARM" == true ]]; then
+    print_status "Installing ARM-compatible packages..."
+    # Some packages might need special handling on ARM
+    if [[ "$OS_ID" == "debian" ]]; then
+        # Ensure we have the right repositories for ARM packages
+        sudo apt install -y ca-certificates gnupg lsb-release
+    fi
+fi
+
+sudo apt install -y $BASE_PACKAGES
 
 # Install Python packages for development
 print_status "Installing Python development packages..."
-sudo apt install -y \
-    python3-pylint \
-    python3-flake8 \
-    python3-mypy \
-    python3-black \
-    python3-isort
+
+# Python development packages
+DEV_PACKAGES="python3-pylint python3-flake8 python3-mypy python3-black python3-isort"
+
+# Try to install development packages, but don't fail if some are unavailable on ARM
+if [[ "$IS_ARM" == true ]]; then
+    print_status "Installing development packages (ARM-compatible)..."
+    for package in $DEV_PACKAGES; do
+        if sudo apt install -y $package 2>/dev/null; then
+            print_status "Installed $package"
+        else
+            print_warning "Package $package not available, will install via pip later"
+        fi
+    done
+else
+    sudo apt install -y $DEV_PACKAGES
+fi
 
 # Create virtual environment
 print_status "Creating Python virtual environment..."
@@ -83,7 +135,19 @@ pip install --upgrade pip
 
 # Install Python dependencies
 print_status "Installing Python dependencies..."
-pip install -r requirements.txt
+
+# ARM-specific pip installation considerations
+if [[ "$IS_ARM" == true ]]; then
+    print_status "Installing Python dependencies (ARM optimized)..."
+    # Install with extended timeout for ARM compilation
+    pip install --timeout 300 -r requirements.txt
+    
+    # Install any missing development tools that weren't available via apt
+    print_status "Installing missing development tools via pip..."
+    pip install --upgrade pylint flake8 mypy black isort 2>/dev/null || print_warning "Some development tools may not be available"
+else
+    pip install -r requirements.txt
+fi
 
 # Create necessary directories
 print_status "Creating system directories..."
@@ -291,8 +355,28 @@ else
     print_warning "Installation test failed, but setup completed"
 fi
 
+# ARM-specific final checks
+if [[ "$IS_ARM" == true ]]; then
+    print_status "Performing ARM-specific validation..."
+    
+    # Check if Python can import key packages
+    source venv/bin/activate
+    python3 -c "import ssl, sqlite3, json" 2>/dev/null && print_success "Core Python modules working on ARM" || print_warning "Some Python modules may have issues on ARM"
+    
+    if [[ "$OS_ID" == "debian" ]]; then
+        print_status "Debian 12 ARM setup completed successfully!"
+    fi
+fi
+
 # Final instructions
 print_success "AI Agent System setup completed!"
+echo
+print_status "System Information:"
+echo "  OS: $OS_ID $OS_VERSION"
+echo "  Architecture: $ARCH"
+if [[ "$IS_ARM" == true ]]; then
+    echo "  ARM Support: Enabled"
+fi
 echo
 echo "Next steps:"
 echo "1. Edit config/.env with your API keys and settings"
@@ -307,4 +391,7 @@ echo "  Check status: python -m console.cli stats"
 echo "  Monitor: python -m console.cli monitor"
 echo "  Backup: ./scripts/backup.sh"
 echo
+if [[ "$IS_ARM" == true ]]; then
+    print_warning "ARM Note: Some packages may take longer to install due to compilation requirements"
+fi
 print_warning "Don't forget to configure your API keys in config/.env!"
