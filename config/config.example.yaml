@@ -1,0 +1,151 @@
+# AI Agent System Configuration
+# Copy this file to config.yaml and customize for your environment
+
+# System settings
+system:
+  name: "AI Code Audit System"
+  version: "1.0.0"
+  environment: "production"  # development, staging, production
+  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  data_dir: "/var/lib/ai-audit"
+  temp_dir: "/tmp/ai-audit"
+  max_workers: 4
+  
+# Database configuration
+database:
+  type: "sqlite"  # sqlite, postgresql
+  sqlite:
+    path: "data/audit.db"
+  postgresql:
+    host: "localhost"
+    port: 5432
+    database: "ai_audit"
+    username: "ai_audit"
+    password: "your_password"
+    
+# LLM API configurations
+llm:
+  default_provider: "openai"  # openai, gemini, anthropic, custom
+  
+  openai:
+    api_key: "sk-your-openai-api-key"
+    model: "gpt-4-turbo-preview"
+    base_url: "https://api.openai.com/v1"
+    max_tokens: 4000
+    temperature: 0.1
+    
+  gemini:
+    api_key: "your-gemini-api-key"
+    model: "gemini-pro"
+    
+  anthropic:
+    api_key: "your-anthropic-api-key"
+    model: "claude-3-sonnet-20240229"
+    
+  custom:
+    api_key: "your-custom-api-key"
+    base_url: "https://your-custom-endpoint.com/v1"
+    model: "custom-model"
+    
+# Web interface settings
+web:
+  host: "0.0.0.0"
+  port: 8080
+  secret_key: "your-secret-key-change-this"
+  cors_origins: ["*"]
+  auth_required: true
+  session_timeout: 3600  # seconds
+  
+# Console interface settings
+console:
+  history_file: "~/.ai_audit_history"
+  max_history: 1000
+  color_output: true
+  
+# Agent configurations
+agents:
+  default_timeout: 3600  # seconds
+  max_concurrent: 2
+  restart_on_failure: true
+  
+  repo_analyzer:
+    enabled: true
+    max_repo_size: "500MB"
+    supported_languages: ["python", "c", "cpp", "javascript", "java", "go", "rust"]
+    
+  issue_finder:
+    enabled: true
+    max_issues_per_run: 100
+    severity_threshold: "medium"  # low, medium, high, critical
+    
+  code_tester:
+    enabled: true
+    test_timeout: 1800  # seconds
+    docker_enabled: false
+    
+  report_generator:
+    enabled: true
+    output_format: "markdown"  # markdown, html, json
+    include_metrics: true
+
+# MCP (Model Context Protocol) settings
+mcp:
+  enabled: true
+  server_port: 9000
+  client_timeout: 30
+  max_connections: 10
+  
+# A2A (Agent-to-Agent) communication
+a2a:
+  enabled: true
+  transport: "redis"  # redis, mqtt, websocket
+  redis:
+    host: "localhost"
+    port: 6379
+    db: 0
+    password: null
+  mqtt:
+    broker: "localhost"
+    port: 1883
+    username: null
+    password: null
+    
+# Git settings
+git:
+  clone_timeout: 300  # seconds
+  max_repo_size: "1GB"
+  cleanup_after: true
+  ssh_key_path: null
+  
+# Security settings
+security:
+  encryption_key: "your-encryption-key-32-chars-long"
+  jwt_secret: "your-jwt-secret-key"
+  api_rate_limit: 100  # requests per minute
+  max_upload_size: "100MB"
+  
+# Monitoring and logging
+monitoring:
+  metrics_enabled: true
+  prometheus_port: 9090
+  health_check_interval: 60  # seconds
+  
+logging:
+  level: "INFO"
+  format: "structured"  # simple, structured
+  file: "logs/ai-audit.log"
+  max_size: "100MB"
+  backup_count: 5
+  
+# Performance tuning
+performance:
+  cache_size: "512MB"
+  worker_memory_limit: "2GB"
+  gc_threshold: 0.8
+  
+# Features flags
+features:
+  experimental_analysis: false
+  auto_fix_suggestions: true
+  pr_auto_creation: false
+  vulnerability_scanning: true
