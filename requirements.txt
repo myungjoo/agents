@@ -12,7 +12,7 @@ anthropic==0.7.8
 requests==2.31.0
 
 # Database
-psycopg2-binary==2.9.9
+psycopg2-binary==2.9.10
 
 # Web Interface
 jinja2==3.1.2
@@ -47,9 +47,6 @@ memory-profiler==0.61.0
 # GitHub Integration
 PyGithub==1.59.1
 
-# MCP Integration
-mcp==1.11.0
-
 # Utilities
 python-dotenv==1.0.0
 pyyaml==6.0.1
@@ -61,11 +58,11 @@ tqdm==4.66.1
 structlog==23.2.0
 
 # Security
-cryptography==41.0.8
+cryptography==41.0.7
 passlib==1.7.4
 
 # Async Support
-asyncio-mqtt==0.16.1
+asyncio-mqtt==0.16.2
 aiohttp==3.9.1
 
 # Development
