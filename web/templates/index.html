@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent System Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .status-running { color: #22c55e; }
+        .status-stopped { color: #ef4444; }
+        .status-working { color: #eab308; }
+        .status-initializing { color: #3b82f6; }
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-start { background-color: #22c55e; color: white; }
+        .btn-start:hover { background-color: #16a34a; }
+        .btn-stop { background-color: #ef4444; color: white; }
+        .btn-stop:hover { background-color: #dc2626; }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold text-center mb-2">AI Agent System Dashboard</h1>
+            <p class="text-center text-gray-400">Live monitoring and control of autonomous agents.</p>
+        </header>
+
+        <main>
+            <!-- Agent Control Section -->
+            <div id="agent-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Agent cards will be dynamically inserted here -->
+            </div>
+
+            <!-- New Job Section -->
+            <div class="mt-12 bg-gray-800 p-6 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4">Launch New Code Audit</h2>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <input type="text" id="repo-url-input" placeholder="https://github.com/user/repository" class="flex-grow bg-gray-700 text-white p-3 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button onclick="runAudit()" class="btn bg-blue-600 text-white hover:bg-blue-700">Start Audit</button>
+                </div>
+                 <p id="job-status" class="mt-4 text-gray-400"></p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const agentList = document.getElementById('agent-list');
+        const jobStatus = document.getElementById('job-status');
+
+        function createAgentCard(name, data) {
+            const statusClass = `status-${data.status.toLowerCase()}`;
+            const isRunning = data.status.toLowerCase() === 'running' || data.status.toLowerCase() === 'working';
+            
+            return `
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold">${name}</h3>
+                        <span class="text-sm font-semibold px-3 py-1 rounded-full ${statusClass} bg-opacity-20 border border-current">${data.status.toUpperCase()}</span>
+                    </div>
+                    <p class="text-gray-400 h-16 overflow-y-auto"><strong>Details:</strong> ${data.details || 'N/A'}</p>
+                    <div class="mt-4 flex gap-4">
+                        <button onclick="startAgent('${name}')" class="btn btn-start" ${isRunning ? 'disabled' : ''} ${isRunning ? 'opacity-50 cursor-not-allowed' : ''}>Start</button>
+                        <button onclick="stopAgent('${name}')" class="btn btn-stop" ${!isRunning ? 'disabled' : ''} ${!isRunning ? 'opacity-50 cursor-not-allowed' : ''}>Stop</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function fetchAgents() {
+            try {
+                const response = await fetch('/api/agents');
+                if (!response.ok) throw new Error('Failed to fetch agents');
+                const agents = await response.json();
+                
+                agentList.innerHTML = ''; // Clear existing cards
+                if (Object.keys(agents).length === 0) {
+                    agentList.innerHTML = '<p class="text-gray-500 col-span-full text-center">No agents found. Make sure the controller is running and agents are defined.</p>';
+                } else {
+                    for (const [name, data] of Object.entries(agents)) {
+                        agentList.innerHTML += createAgentCard(name, data);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching agents:", error);
+                agentList.innerHTML = `<p class="text-red-500 col-span-full text-center">Error: Could not connect to the agent controller.</p>`;
+            }
+        }
+
+        async function apiCall(url, method = 'POST', body = null) {
+            try {
+                const options = {
+                    method: method,
+                    headers: {'Content-Type': 'application/json'}
+                };
+                if (body) options.body = JSON.stringify(body);
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'API request failed');
+                }
+                fetchAgents(); // Refresh list after action
+                return await response.json();
+            } catch (error) {
+                console.error(`Error with ${method} ${url}:`, error);
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        function startAgent(name) {
+            apiCall(`/api/agents/${name}/start`);
+        }
+
+        function stopAgent(name) {
+            apiCall(`/api/agents/${name}/stop`);
+        }
+        
+        async function runAudit() {
+            const repoUrlInput = document.getElementById('repo-url-input');
+            const repoUrl = repoUrlInput.value;
+            if (!repoUrl || !repoUrl.startsWith('https://github.com/')) {
+                alert('Please enter a valid GitHub repository URL.');
+                return;
+            }
+            
+            jobStatus.textContent = 'Assigning job to code_auditor...';
+            const result = await apiCall('/api/jobs/run-audit', 'POST', { agent_name: 'code_auditor', repo_url: repoUrl });
+            if (result) {
+                jobStatus.textContent = `✅ ${result.message}`;
+                repoUrlInput.value = '';
+            } else {
+                jobStatus.textContent = '❌ Failed to assign job.';
+            }
+        }
+
+        // Fetch agents on load and then every 3 seconds
+        fetchAgents();
+        setInterval(fetchAgents, 3000);
+    </script>
+</body>
+</html>
+
