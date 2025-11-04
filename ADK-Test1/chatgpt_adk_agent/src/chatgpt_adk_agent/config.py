@@ -59,7 +59,8 @@ class Settings(BaseModel):
 def require_api_key(settings: Settings) -> None:
     """필수 입력을 검증한다."""
 
-    if not settings.chatgpt.api_key:
+    api_key = settings.chatgpt.api_key.strip()
+    if not api_key or api_key.startswith("<YOUR_") or api_key.startswith("<REPLACE_"):
         raise RuntimeError(
             "ChatGPT API 키가 설정되어 있지 않습니다. config/settings.toml 파일을 확인하세요."
         )

@@ -105,6 +105,8 @@ class MCPClientRegistry:
         """MCP 클라이언트가 없을 때의 폴백 구현."""
 
         root = self._extract_root(cfg) or Path.cwd()
+        if not root.exists():
+            return [f"[{cfg.name}] 검색 루트가 존재하지 않습니다: {root}"]
         matches: List[str] = []
 
         queue = deque([root])
