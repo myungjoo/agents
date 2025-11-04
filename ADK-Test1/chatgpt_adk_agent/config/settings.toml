@@ -1,0 +1,20 @@
+[chatgpt]
+# ChatGPT(OpenAI) API 키를 입력하세요. 예: "sk-..."
+api_key = ""
+
+# 사용할 ChatGPT 모델 ID. 필요에 맞게 변경 가능합니다.
+model = "gpt-4.1-mini"
+
+[[mcp_servers]]
+# MCP 서버 식별자
+name = "local-files"
+# 연결 방식(stdio, sse, grpc 등)
+transport = "stdio"
+# 서버 실행 명령어와 인자
+command = "python"
+args = ["-m", "chatgpt_adk_agent.mcp.local_file_server", "--root", "."]
+
+[a2a]
+# 다른 에이전트와 소통할 A2A 엔드포인트 기본 URL
+base_url = "http://localhost:8080"
+timeout_seconds = 30
